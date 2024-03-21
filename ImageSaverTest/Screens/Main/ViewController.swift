@@ -91,7 +91,7 @@ final class ViewController: UIViewController {
     }
     
     private func openDetailedController(with capture: CaptureInfo) {
-        let detailVC = DetailViewController.configured(viewModel: viewModel, capture: capture)
+        let detailVC = DetailViewController(viewModel: viewModel, capture: capture)
         let navigationVC = UINavigationController(rootViewController: detailVC)
         navigationVC.modalPresentationStyle = .overCurrentContext
         navigationVC.modalTransitionStyle = .crossDissolve

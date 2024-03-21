@@ -1,20 +1,28 @@
 import UIKit
  
-final class DetailViewController: UIViewController, Storyboarded {
+final class DetailViewController: UIViewController {
     private let titleButton = UIButton(type: .custom)
     private let contentImageView = UIImageView()
     
     private var firstPoint: CGPoint?
     private var lastPoint: CGPoint?
     
-    private var viewModel: ViewModel?
-    private var capture: CaptureInfo?
+    private var viewModel: ViewModel
+    private var capture: CaptureInfo
     
-    static func configured(viewModel: ViewModel, capture: CaptureInfo) -> DetailViewController {
-        let vc = DetailViewController.instantiate()
-        vc.viewModel = viewModel
-        vc.capture = capture
-        return vc
+    init(viewModel: ViewModel, capture: CaptureInfo) {
+        self.viewModel = viewModel
+        self.capture = capture
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -24,7 +32,6 @@ final class DetailViewController: UIViewController, Storyboarded {
     }
     
     private func layoutView() {
-        guard let capture else { return }
         configureNavigation(with: capture.title?.description)
         layoutImageView(with: capture.image)
     }
@@ -50,18 +57,16 @@ final class DetailViewController: UIViewController, Storyboarded {
         
         alertController.addTextField { [weak self] (textField) in
             guard let self else { return }
-            textField.text = capture?.title?.description
+            textField.text = capture.title?.description
         }
         
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         let doneAction = UIAlertAction(title: "Done", style: .default) { [weak self] _ in
             guard let self, let textField = alertController.textFields?.first,
                   let enteredText = textField.text, !enteredText.isEmpty else { return }
-            capture?.title = .userChanged(string: enteredText)
+            capture.title = .userChanged(string: enteredText)
             configureNavigation(with: enteredText)
-            if let capture {
-                viewModel?.changeCapture(capture)
-            }
+            viewModel.changeCapture(capture)
         }
         alertController.addAction(doneAction)
         present(alertController, animated: true, completion: nil)
